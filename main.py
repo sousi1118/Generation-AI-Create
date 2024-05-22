@@ -1,55 +1,40 @@
-import streamlit as st
-from openai import OpenAI
+##チャットボットの作成
+from flask import Flask, request, jsonify
+import pandas as pd
 
-# 必要なモジュールのインポート
-from openai_client import OpenAIClient
-from serializer import serialize
-from database_handler import DatabaseHandler
-from streamlit_interface import initialize_session_state, display_chat, add_user_message, add_assistant_message
+app = Flask(__name__)
 
-# Streamlitアプリのタイトルを設定する
-st.title("egg-professional")
+# データベースの読み込み
+df = pd.read_csv('drinks.csv')
 
-# セッション状態の初期化
-initialize_session_state()
-
-# これまでのメッセージを表示
-display_chat()
-
-# ユーザーが新しいメッセージを入力できるテキストボックス
-if prompt := st.chat_input("質問やメッセージを入力してください"):
-    # ユーザーメッセージを追加
-    add_user_message(prompt)
+@app.route('/generate_label', methods=['POST'])
+def generate_label():
+    data = request.json
+    product_name = data.get('product_name')
     
-    # OpenAI クライアントの初期化と埋め込み生成
-    openai_client = OpenAIClient(model="text-embedding-3-large")
-    query_embedding = openai_client.generate_embedding(prompt)
-    serialized_embedding = serialize(query_embedding)
+    if product_name not in df['product_name'].values:
+        return jsonify({"error": "Product not found"}), 404
+    
+    product_info = df[df['product_name'] == product_name].iloc[0]
+    label = {
+        "product_name": product_info['product_name'],
+        "description": product_info['description'],
+        "ingredients": product_info['ingredients'],
+        "volume": product_info['volume']
+    }
+    
+    return jsonify(label)
 
-    # データベースの操作
-    db_handler = DatabaseHandler("example_vec.db")
-    db_handler.connect()
-    results = db_handler.search_recipes(serialized_embedding)
-    db_handler.close()
+if __name__ == '__main__':
+    app.run(debug=True)
 
-    # レシピ検索結果をセッションに追加
-    message = [{"role": m["role"], "content": m["content"]} for m in st.session_state.messages]
-    message.insert(
-        0,
-        {
-            "role": "system",
-            "content": f"# レシピ検索結果\n {results} \nこれはレシピ検索結果です。これに基づいて質問に答えます。レシピ検索結果がない場合は、「データにありません」を出力します。",
-        },
-    )
+##ラベル情報の生成
+import requests
 
-    # OpenAI APIを使用してアシスタントの応答を取得
-    client = OpenAI()
-    stream = client.chat.completions.create(
-        model=st.session_state["openai_model"],
-        messages=message,
-        stream=True,
-    )
-    response = st.write_stream(stream)
+url = 'http://127.0.0.1:5000/generate_label'
+data = {
+    "product_name": "キリンレモン"
+}
 
-    # アシスタントメッセージを追加
-    add_assistant_message(response)
+response = requests.post(url, json=data)
+print(response.json())    
