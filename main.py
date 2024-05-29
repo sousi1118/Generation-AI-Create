@@ -1,43 +1,36 @@
 import streamlit as st
 import pandas as pd
+import os
 
-# CSVファイルの読み込み
-csv_file = 'drinks.csv'  # CSVファイルのパス
-df = pd.read_csv(csv_file)
+# CSVファイルを読み込む
+@st.cache_data
+def load_data():
+    return pd.read_csv("drinks.csv")
 
-# アプリケーションのタイトル
-st.title('Drink Label Generator')
+# データの読み込み
+data = load_data()
 
-# サイドバーに新しいラベル情報を入力するフォームを作成
-st.sidebar.header('Create a New Label')
-product_name = st.sidebar.text_input('Product Name')
-description = st.sidebar.text_input('Description')
-taste = st.sidebar.text_input('Taste')
-volume = st.sidebar.text_input('Volume')
+# タイトル
+st.title("エナジードリンク情報表示")
 
-# サイドバーのボタンを押して新しいラベルを追加
-if st.sidebar.button('Add New Label'):
-    new_label = {
-        'product_name': product_name,
-        'description': description,
-        'taste': taste,
-        'volume': volume
-    }
-    df = df.append(new_label, ignore_index=True)
-    df.to_csv(csv_file, index=False)
-    st.sidebar.success('New label added successfully!')
+# デバッグ情報を表示
+st.write("CSVファイルの内容:")
+st.dataframe(data)
 
-# 既存のラベルを選択して表示
-st.header('Existing Labels')
-selected_product = st.selectbox('Select a product', df['product_name'].unique())
+# セレクトボックスで商品名を選択
+product_name = st.selectbox("商品名を選択してください", data['product_name'])
 
-if selected_product:
-    product_info = df[df['product_name'] == selected_product].iloc[0]
-    st.subheader(f'Label for {selected_product}')
-    st.text(f"Description: {product_info['description']}")
-    st.text(f"Taste: {product_info['taste']}")
-    st.text(f"Volume: {product_info['volume']}")
+# 選択した商品名のデータを表示
+if product_name:
+    selected_data = data[data['product_name'] == product_name]
+    st.write("選択した商品名の内容:")
+    st.dataframe(selected_data)
 
-# 全てのラベルを表示
-st.header('All Labels')
-st.dataframe(df)
+    # 画像の表示
+    image_folder = "炭酸飲料画像"
+    file_name = selected_data['file_name'].values[0]  # assuming there is a column named 'file_name'
+    image_path = os.path.join(image_folder, file_name)  # assuming the file_name matches the image file name
+    if os.path.exists(image_path):
+        st.image(image_path, caption=product_name)
+    else:
+        st.write("画像が見つかりませんでした")
