@@ -4,8 +4,7 @@ import pandas as pd
 import os
 import requests
 
-# Set up OpenAI API key
-openai.api_key = 'your_openai_api_key'
+
 
 st.title("Carbonated Drink Package Generator")
 
@@ -50,7 +49,15 @@ volume = st.text_input("Volume")
 if st.button("Generate Image"):
     if product_name and description and taste and volume:
         # Create the prompt for the image generation
-        prompt = f"prompt = f"容量{volume}の{taste}風味の炭酸飲料の画像を作成してください。ボトルは透明で、中に炭酸の{taste}飲料が見えるようにしてください。ラベルは入力された{product_name}を参照して、{taste}のグラフィックが大胆に描かれ、ブランド名{product_name}が上部に目立つように表示されるようにしてください。デザインはモダンでリフレッシュ感があり、ボトルに水滴がついて冷たさを感じさせるようにしてください。背景はシンプルで白にして、ボトルに焦点が当たるようにしてください。"
+        prompt = (
+            f"容量{volume}の{taste}風味の炭酸飲料の画像を作成してください。"
+            f"ボトルは透明で、中に炭酸の{taste}飲料が見えるようにしてください。"
+            f"ラベルは明るい黄色で、{taste}のグラフィックが大胆に描かれ、"
+            f"ブランド名{product_name}が上部に目立つように表示されるようにしてください。"
+            f"ラベルには高ビタミンCを含むことも強調してください。"
+            f"デザインはモダンでリフレッシュ感があり、ボトルに水滴がついて冷たさを感じさせるようにしてください。"
+            f"背景はシンプルで白にして、ボトルに焦点が当たるようにしてください。"
+        )
 
         # Call OpenAI API to generate the image
         response = openai.Image.create(
