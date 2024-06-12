@@ -1,36 +1,59 @@
 import streamlit as st
+import openai
 import pandas as pd
-import os
 
-# CSVファイルを読み込む
-@st.cache_data
-def load_data():
-    return pd.read_csv("drinks.csv")
+# Set up OpenAI API key
+openai.api_key = 'your_openai_api_key'
 
-# データの読み込み
-data = load_data()
+st.title("Carbonated Drink Package Generator")
 
-# タイトル
-st.title("エナジードリンク情報表示")
+# Load the CSV file
+data = pd.read_csv("drinks.csv")
 
-# デバッグ情報を表示
-st.write("CSVファイルの内容:")
+# Display the data
+st.write("Here is the current data on carbonated drinks:")
 st.dataframe(data)
 
-# セレクトボックスで商品名を選択
-product_name = st.selectbox("商品名を選択してください", data['product_name'])
+# Input form for new drink
+st.header("Enter details for a new carbonated drink")
+file_name = st.text_input("File Name")
+product_name = st.text_input("Product Name")
+description = st.text_input("Description")
+taste = st.text_input("Taste")
+volume = st.text_input("Volume")
 
-# 選択した商品名のデータを表示
-if product_name:
-    selected_data = data[data['product_name'] == product_name]
-    st.write("選択した商品名の内容:")
-    st.dataframe(selected_data)
+if st.button("Generate Image"):
+    # Create the prompt for DALL-E
+    prompt = f"Create an image of a {taste}-flavored carbonated drink with a {volume} capacity. The bottle should be clear, showcasing the fizzy {taste} beverage inside. The label should be bright yellow with a bold {taste} graphic, and the brand name {product_name} should be prominently displayed at the top. The label should also highlight that it contains high vitamin C. The design should be modern and refreshing, with some water droplets on the bottle to indicate coldness. The background should be simple and white to keep the focus on the bottle."
 
-    # 画像の表示
-    image_folder = "炭酸飲料画像"
-    file_name = selected_data['file_name'].values[0]  # assuming there is a column named 'file_name'
-    image_path = os.path.join(image_folder, file_name)  # assuming the file_name matches the image file name
-    if os.path.exists(image_path):
-        st.image(image_path, caption=product_name)
-    else:
-        st.write("画像が見つかりませんでした")
+    # Call OpenAI API to generate the image
+    response = openai.Image.create(
+        prompt=prompt,
+        n=1,
+        size="1024x1024"
+    )
+    
+    image_url = response['data'][0]['url']
+    
+    # Display the generated image
+    st.image(image_url, caption=f"{product_name} Package")
+
+    # Add new data to dataframe
+    new_data = pd.DataFrame({
+        "file_name": [file_name],
+        "product_name": [product_name],
+        "description": [description],
+        "taste": [taste],
+        "volume": [volume]
+    })
+    
+    data = data.append(new_data, ignore_index=True)
+    
+    # Save updated data
+    data.to_csv("drinks.csv", index=False)
+    
+    st.success("New drink added and image generated!")
+
+# Optionally, display the updated dataframe
+st.write("Updated data on carbonated drinks:")
+st.dataframe(data)
