@@ -5,7 +5,6 @@ import os
 import requests
 
 
-
 st.title("Carbonated Drink Package Generator")
 
 # Function to check and clean the CSV file
