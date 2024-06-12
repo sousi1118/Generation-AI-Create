@@ -3,9 +3,6 @@ import openai
 import pandas as pd
 import os
 
-# Set up OpenAI API key
-openai.api_key = 'your_openai_api_key'
-
 st.title("Carbonated Drink Package Generator")
 
 # Check if the CSV file exists, if not create an empty dataframe and save it as a CSV file
