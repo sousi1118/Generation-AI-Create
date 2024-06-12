@@ -4,6 +4,8 @@ import pandas as pd
 import os
 import requests
 
+# Set up OpenAI API key
+openai.api_key = 'your_openai_api_key'
 
 st.title("Carbonated Drink Package Generator")
 
@@ -47,7 +49,7 @@ volume = st.text_input("Volume")
 
 if st.button("Generate Image"):
     if product_name and description and taste and volume:
-        # Create the prompt for DALL-E
+        # Create the prompt for the image generation
         prompt = f"Create an image of a {taste}-flavored carbonated drink with a {volume} capacity. The bottle should be clear, showcasing the fizzy {taste} beverage inside. The label should be bright yellow with a bold {taste} graphic, and the brand name {product_name} should be prominently displayed at the top. The label should also highlight that it contains high vitamin C. The design should be modern and refreshing, with some water droplets on the bottle to indicate coldness. The background should be simple and white to keep the focus on the bottle."
 
         # Call OpenAI API to generate the image
