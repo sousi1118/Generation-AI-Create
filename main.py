@@ -48,6 +48,7 @@ if st.button("画像を生成"):
     if product_name and description and taste and volume:
         # 画像生成のためのプロンプトを作成
         prompt = (
+            f"{data}を参照して"
             f"容量{volume}の{taste}風味の炭酸飲料の画像を作成してください。"
             f"ボトルは透明で、中に炭酸の{taste}飲料が見えるようにしてください。"
             f"ラベルは{product_name}の情報を参考にして、{taste}のグラフィックが大胆に描かれ、"
