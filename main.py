@@ -50,7 +50,7 @@ volume = st.text_input("Volume")
 if st.button("Generate Image"):
     if product_name and description and taste and volume:
         # Create the prompt for the image generation
-        prompt = f"Create an image of a {taste}-flavored carbonated drink with a {volume} capacity. The bottle should be clear, showcasing the fizzy {taste} beverage inside. The label should be bright yellow with a bold {taste} graphic, and the brand name {product_name} should be prominently displayed at the top. The label should also highlight that it contains high vitamin C. The design should be modern and refreshing, with some water droplets on the bottle to indicate coldness. The background should be simple and white to keep the focus on the bottle."
+        prompt = f"prompt = f"容量{volume}の{taste}風味の炭酸飲料の画像を作成してください。ボトルは透明で、中に炭酸の{taste}飲料が見えるようにしてください。ラベルは入力された{product_name}を参照して、{taste}のグラフィックが大胆に描かれ、ブランド名{product_name}が上部に目立つように表示されるようにしてください。デザインはモダンでリフレッシュ感があり、ボトルに水滴がついて冷たさを感じさせるようにしてください。背景はシンプルで白にして、ボトルに焦点が当たるようにしてください。"
 
         # Call OpenAI API to generate the image
         response = openai.Image.create(
