@@ -1,37 +1,32 @@
 import streamlit as st
-import openai
 import pandas as pd
 import os
 import requests
 
+from openai import OpenAI
+client = OpenAI()
+
 st.title("炭酸飲料パッケージジェネレーター")
 
-# CSVファイルのチェックとクリーンアップを行う関数
-def clean_csv(file_path):
+# エクセルファイルのチェックとクリーンアップを行う関数
+def clean_excel(file_path):
     try:
-        data = pd.read_csv(file_path)
-        if len(data.columns) != 5:
-            raise ValueError("CSVファイルの列数が期待されたものと異なります。")
-    except pd.errors.ParserError as e:
-        st.error(f"CSVファイルの読み込みエラー: {e}")
-        with open(file_path, 'r') as f:
-            content = f.readlines()
-        st.text("CSVファイルの内容（最初の50行）:")
-        st.text("".join(content[:50]))  # CSVファイルの最初の50行を表示
-        data = pd.DataFrame(columns=["file_name", "product_name", "description", "taste", "volume"])
+        data = pd.read_excel(file_path)
+        if len(data.columns) != 6:
+            raise ValueError("エクセルファイルの列数が期待されたものと異なります。")
     except Exception as e:
-        st.error(f"予期せぬエラー: {e}")
+        st.error(f"エクセルファイルの読み込みエラー: {e}")
         data = pd.DataFrame(columns=["file_name", "product_name", "description", "taste", "volume"])
     return data
 
-# CSVファイルが存在するかチェック、存在しない場合は空のデータフレームを作成してCSVとして保存
-csv_file = "drinks.csv"
-if not os.path.exists(csv_file):
+# エクセルファイルが存在するかチェック、存在しない場合は空のデータフレームを作成してエクセルとして保存
+excel_file = "drinks.xlsx"
+if not os.path.exists(excel_file):
     data = pd.DataFrame(columns=["file_name", "product_name", "description", "taste", "volume"])
-    data.to_csv(csv_file, index=False)
+    data.to_excel(excel_file, index=False)
 else:
-    # CSVファイルをロードしてクリーンアップ
-    data = clean_csv(csv_file)
+    # エクセルファイルをロードしてクリーンアップ
+    data = clean_excel(excel_file)
 
 # データの表示
 st.write("現在の炭酸飲料データ:")
@@ -57,14 +52,17 @@ if st.button("画像を生成"):
             f"背景はシンプルで白にして、ボトルに焦点が当たるようにしてください。"
         )
 
+        print(prompt)
+
         # OpenAI APIを呼び出して画像を生成
-        response = openai.Image.create(
+        response = client.images.generate(
+            model="dall-e-3",
             prompt=prompt,
             n=1,
             size="1024x1024"
         )
         
-        image_url = response['data'][0]['url']
+        image_url = response.data[0].url
         
         # 生成された画像を保存
         image_response = requests.get(image_url)
@@ -87,7 +85,7 @@ if st.button("画像を生成"):
         data = data.append(new_data, ignore_index=True)
         
         # 更新されたデータを保存
-        data.to_csv(csv_file, index=False)
+        data.to_excel(excel_file, index=False)
         
         st.success("新しい飲料が追加され、画像が生成されました！")
     else:
