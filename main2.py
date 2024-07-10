@@ -64,10 +64,10 @@ if st.button("画像を生成"):
         image_url = response.data[0].url
         
         # 生成された画像を保存
-        image_response = requests.get(image_url)
-        file_name = f"{product_name.replace(' ', '_')}.jpg"
-        with open(file_name, 'wb') as f:
-            f.write(image_response.content)
+        #image_response = requests.get(image_url)
+        #file_name = f"{product_name.replace(' ', '_')}.jpg"
+        #with open(file_name, 'wb') as f:
+        #    f.write(image_response.content)
         
         # 生成された画像を表示
         st.image(image_url, caption=f"{product_name} パッケージ")
