@@ -38,6 +38,7 @@ product_name = st.text_input("商品名")
 description = st.text_input("説明")
 taste = st.text_input("味")
 volume = st.text_input("容量")
+design = st.text_input("デザイン")
 
 if st.button("画像を生成"):
     if product_name and description and taste and volume:
@@ -48,7 +49,7 @@ if st.button("画像を生成"):
             f"ペットボトルは透明で、中に炭酸の{taste}飲料が見えるようにしてください。"
             f"ラベルは{product_name}の情報を参考にして、{taste}のグラフィックが大胆に描かれ、"
             f"ブランド名{product_name}が上部に目立つように表示されるようにしてください。"
-            f"デザインはモダンでリフレッシュ感があり、ペットボトルに水滴がついて冷たさを感じさせるようにしてください。"
+            f"{design}を参照してモダンでリフレッシュ感があり、ペットボトルに水滴がついて冷たさを感じさせるようにしてください。"
             f"背景はシンプルで白にして、ペットボトルに焦点が当たるようにしてください。"
         )
 
@@ -79,7 +80,8 @@ if st.button("画像を生成"):
             "product_name": [product_name],
             "description": [description],
             "taste": [taste],
-            "volume": [volume]
+            "volume": [volume],
+            "design" : [design]
         })
         
         data = data.append(new_data, ignore_index=True)
